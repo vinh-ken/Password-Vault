@@ -127,8 +127,23 @@
         // --- Firebase Configuration and Initialization ---
         // Global variables provided by the Canvas environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const canvasFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- Instructions for Local Deployment ---
+        // If you are running this code locally in VS Code, paste your Firebase
+        // configuration object below from your Firebase project's console.
+        const localFirebaseConfig = {
+          apiKey: "AIzaSyA8d5pVsBDOP9YJkn54dV-KjioD3IOyPw0",
+          authDomain: "password-vault-81b22.firebaseapp.com",
+          projectId: "password-vault-81b22",
+          storageBucket: "password-vault-81b22.firebasestorage.app",
+          messagingSenderId: "1073446855313",
+          appId: "1:1073446855313:web:243438becc9f4f70989530"
+        };
+        
+        // Use the Canvas config if available, otherwise use the local config.
+        const firebaseConfig = Object.keys(canvasFirebaseConfig).length > 0 ? canvasFirebaseConfig : localFirebaseConfig;
 
         let app, db, auth, userId;
 
@@ -177,7 +192,7 @@
                 }
             });
         } else {
-            // Handle case where firebase config is not available
+            // This case should be handled by the localFirebaseConfig fallback
             console.error("Firebase config is not available.");
             showModal("Setup Error", "Firebase configuration is missing. The app cannot function.");
         }
@@ -199,7 +214,7 @@
             const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
             const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             const numberChars = '0123456789';
-            const symbolChars = '!@#$%^&*()_+~`|}{[]:;?><,./-=';
+            const symbolChars = '!@#$%^&*()_+~`|}{[\]:;?><,./-=';
             
             let allChars = lowercaseChars;
             if (includeUppercase) allChars += uppercaseChars;
