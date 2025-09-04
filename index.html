@@ -40,6 +40,7 @@
                 <div id="masterPasswordConfirmDiv" class="hidden">
                     <label for="masterPasswordConfirm" class="block text-sm font-medium text-gray-700">Confirm Master Password</label>
                     <input type="password" id="masterPasswordConfirm" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 password-field" placeholder="Confirm master password">
+                    <div id="masterPasswordMatchMessage" class="mt-2 text-sm"></div>
                 </div>
                 <button id="masterPasswordBtn" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">Set Master Password</button>
             </div>
@@ -178,6 +179,7 @@
         const masterPasswordConfirmDiv = document.getElementById('masterPasswordConfirmDiv');
         const masterPasswordConfirm = document.getElementById('masterPasswordConfirm');
         const masterPasswordBtn = document.getElementById('masterPasswordBtn');
+        const masterPasswordMatchMessage = document.getElementById('masterPasswordMatchMessage');
         const vaultContent = document.getElementById('vaultContent');
 
         function showModal(title, message) {
@@ -241,6 +243,17 @@
             masterPasswordSection.classList.remove('hidden');
             masterPasswordInput.focus();
         }
+
+        // Add real-time validation for password match
+        masterPasswordConfirm.addEventListener('input', () => {
+            if (masterPasswordInput.value === masterPasswordConfirm.value) {
+                masterPasswordMatchMessage.textContent = 'Passwords match!';
+                masterPasswordMatchMessage.className = 'mt-2 text-sm text-green-600';
+            } else {
+                masterPasswordMatchMessage.textContent = 'Passwords do not match.';
+                masterPasswordMatchMessage.className = 'mt-2 text-sm text-red-600';
+            }
+        });
 
         async function setMasterPassword() {
             const password = masterPasswordInput.value;
