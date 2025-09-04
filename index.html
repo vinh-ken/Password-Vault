@@ -244,26 +244,26 @@
             masterPasswordInput.focus();
         }
 
-        // Add real-time validation for password match
+        // Add real-time validation for password match, now with trimming
         masterPasswordConfirm.addEventListener('input', () => {
-            if (masterPasswordInput.value === masterPasswordConfirm.value) {
+            if (masterPasswordInput.value.trim() === masterPasswordConfirm.value.trim()) {
                 masterPasswordMatchMessage.textContent = 'Passwords match!';
                 masterPasswordMatchMessage.className = 'mt-2 text-sm text-green-600';
             } else {
-                masterPasswordMatchMessage.textContent = 'Passwords do not match.';
+                masterPasswordMatchMessage.textContent = 'Passwords do not match. Check for extra spaces.';
                 masterPasswordMatchMessage.className = 'mt-2 text-sm text-red-600';
             }
         });
 
         async function setMasterPassword() {
-            const password = masterPasswordInput.value;
-            const confirmPassword = masterPasswordConfirm.value;
+            const password = masterPasswordInput.value.trim();
+            const confirmPassword = masterPasswordConfirm.value.trim();
             if (password.length < 8) {
                 showModal("Error", "Master password must be at least 8 characters long.");
                 return;
             }
             if (password !== confirmPassword) {
-                showModal("Error", "Passwords do not match.");
+                showModal("Error", "Passwords do not match. Please check for typos and extra spaces.");
                 return;
             }
 
@@ -293,7 +293,7 @@
         }
 
         async function unlockVault() {
-            const password = masterPasswordInput.value;
+            const password = masterPasswordInput.value.trim();
             if (!password) {
                 showModal("Error", "Please enter your master password.");
                 return;
