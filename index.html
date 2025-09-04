@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Vault</title>
+    <title>Secure Password Vault</title>
     <!-- Use Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -23,80 +23,100 @@
 
     <!-- Main Application Container -->
     <div id="app" class="container mx-auto p-8 bg-white rounded-xl shadow-lg border-t-4 border-indigo-500">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Password Vault</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Secure Password Vault</h1>
         <p class="text-center text-gray-500 mb-6">
             Generate and securely store your passwords. Your User ID is: <span id="userIdDisplay" class="font-mono text-gray-700 font-semibold text-sm"></span>
         </p>
-        
-        <!-- Password Generation Section -->
-        <div class="bg-gray-50 p-6 rounded-lg mb-6 shadow-sm border border-gray-200">
-            <h2 class="text-xl font-semibold text-gray-700 mb-4">Generate a New Password</h2>
-            
+
+        <!-- Master Password Section (Shown on startup) -->
+        <div id="masterPasswordSection" class="bg-gray-50 p-6 rounded-lg mb-6 shadow-sm border border-gray-200">
+            <h2 id="masterPasswordTitle" class="text-xl font-semibold text-gray-700 mb-4 text-center">Set Your Master Password</h2>
+            <p id="masterPasswordMessage" class="text-center text-sm text-gray-600 mb-4"></p>
             <div class="space-y-4">
                 <div>
-                    <label for="passwordLength" class="block text-sm font-medium text-gray-700">Password Length</label>
-                    <input type="number" id="passwordLength" value="16" min="8" max="64" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <label for="masterPasswordInput" class="block text-sm font-medium text-gray-700">Master Password</label>
+                    <input type="password" id="masterPasswordInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 password-field" placeholder="Enter your master password">
                 </div>
-                
-                <div class="flex items-center space-x-4">
-                    <label class="flex items-center">
-                        <input type="checkbox" id="includeUppercase" checked class="rounded text-indigo-600 focus:ring-indigo-500">
-                        <span class="ml-2 text-sm text-gray-600">Uppercase</span>
-                    </label>
-                    <label class="flex items-center">
-                        <input type="checkbox" id="includeNumbers" checked class="rounded text-indigo-600 focus:ring-indigo-500">
-                        <span class="ml-2 text-sm text-gray-600">Numbers</span>
-                    </label>
-                    <label class="flex items-center">
-                        <input type="checkbox" id="includeSymbols" checked class="rounded text-indigo-600 focus:ring-indigo-500">
-                        <span class="ml-2 text-sm text-gray-600">Symbols</span>
-                    </label>
+                <div id="masterPasswordConfirmDiv" class="hidden">
+                    <label for="masterPasswordConfirm" class="block text-sm font-medium text-gray-700">Confirm Master Password</label>
+                    <input type="password" id="masterPasswordConfirm" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 password-field" placeholder="Confirm master password">
                 </div>
-                
-                <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-                    <button id="generatePasswordBtn" class="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">Generate Password</button>
-                    <input type="text" id="generatedPassword" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 password-field" placeholder="Generated Password">
-                </div>
+                <button id="masterPasswordBtn" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">Set Master Password</button>
             </div>
         </div>
 
-        <!-- Add New Password Section -->
-        <div class="bg-gray-50 p-6 rounded-lg mb-6 shadow-sm border border-gray-200">
-            <h2 class="text-xl font-semibold text-gray-700 mb-4">Add a New Password</h2>
-            <div class="space-y-4">
-                <div>
-                    <label for="websiteInput" class="block text-sm font-medium text-gray-700">Website</label>
-                    <input type="text" id="websiteInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="e.g., Google, Amazon">
-                </div>
-                <div>
-                    <label for="usernameInput" class="block text-sm font-medium text-gray-700">Username or Email</label>
-                    <input type="text" id="usernameInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="e.g., user@example.com">
-                </div>
-                <div>
-                    <label for="passwordInput" class="block text-sm font-medium text-gray-700">Password</label>
-                    <div class="relative mt-1">
-                        <input type="password" id="passwordInput" class="block w-full rounded-md border-gray-300 shadow-sm pr-10 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 password-field" placeholder="Enter or paste password">
-                        <button id="togglePasswordVisibility" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
+        <!-- Main Vault Content (Hidden until authenticated) -->
+        <div id="vaultContent" class="hidden">
+            <!-- Password Generation Section -->
+            <div class="bg-gray-50 p-6 rounded-lg mb-6 shadow-sm border border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">Generate a New Password</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="passwordLength" class="block text-sm font-medium text-gray-700">Password Length</label>
+                        <input type="number" id="passwordLength" value="16" min="8" max="64" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                     </div>
-                    <div id="passwordStrength" class="mt-2 text-sm text-gray-500"></div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="includeUppercase" checked class="rounded text-indigo-600 focus:ring-indigo-500">
+                            <span class="ml-2 text-sm text-gray-600">Uppercase</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="includeNumbers" checked class="rounded text-indigo-600 focus:ring-indigo-500">
+                            <span class="ml-2 text-sm text-gray-600">Numbers</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="includeSymbols" checked class="rounded text-indigo-600 focus:ring-indigo-500">
+                            <span class="ml-2 text-sm text-gray-600">Symbols</span>
+                        </label>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                        <button id="generatePasswordBtn" class="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">Generate Password</button>
+                        <input type="text" id="generatedPassword" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 password-field" placeholder="Generated Password">
+                    </div>
                 </div>
-                <button id="savePasswordBtn" class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">Save Password</button>
             </div>
-        </div>
 
-        <!-- Stored Passwords Section -->
-        <div>
-            <h2 class="text-xl font-semibold text-gray-700 mb-4">Your Saved Passwords</h2>
-            <div id="passwordList" class="space-y-4">
-                <!-- Stored passwords will be dynamically added here -->
+            <!-- Add New Password Section -->
+            <div class="bg-gray-50 p-6 rounded-lg mb-6 shadow-sm border border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">Add a New Password</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="websiteInput" class="block text-sm font-medium text-gray-700">Website</label>
+                        <input type="text" id="websiteInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="e.g., Google, Amazon">
+                    </div>
+                    <div>
+                        <label for="usernameInput" class="block text-sm font-medium text-gray-700">Username or Email</label>
+                        <input type="text" id="usernameInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="e.g., user@example.com">
+                    </div>
+                    <div>
+                        <label for="passwordInput" class="block text-sm font-medium text-gray-700">Password</label>
+                        <div class="relative mt-1">
+                            <input type="password" id="passwordInput" class="block w-full rounded-md border-gray-300 shadow-sm pr-10 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 password-field" placeholder="Enter or paste password">
+                            <button id="togglePasswordVisibility" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="passwordStrength" class="mt-2 text-sm text-gray-500"></div>
+                    </div>
+                    <button id="savePasswordBtn" class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">Save Password</button>
+                </div>
             </div>
-            <div id="noPasswordsMessage" class="text-center text-gray-500 mt-6 hidden">
-                You haven't saved any passwords yet.
+
+            <!-- Stored Passwords Section -->
+            <div>
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">Your Saved Passwords</h2>
+                <div id="passwordList" class="space-y-4">
+                    <!-- Stored passwords will be dynamically added here -->
+                </div>
+                <div id="noPasswordsMessage" class="text-center text-gray-500 mt-6 hidden">
+                    You haven't saved any passwords yet.
+                </div>
             </div>
         </div>
         
@@ -118,21 +138,22 @@
         </div>
     </div>
     
-    <!-- Firebase Libraries -->
+    <!-- Firebase and Crypto Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js" type="module"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sjcl/1.0.8/sjcl.min.js"></script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // --- Firebase Configuration and Initialization ---
-        // Global variables provided by the Canvas environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const canvasFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        // --- Instructions for Local Deployment ---
-        // If you are running this code locally in VS Code, paste your Firebase
-        // configuration object below from your Firebase project's console.
         const localFirebaseConfig = {
           apiKey: "AIzaSyA8d5pVsBDOP9YJkn54dV-KjioD3IOyPw0",
           authDomain: "password-vault-81b22.firebaseapp.com",
@@ -142,16 +163,23 @@
           appId: "1:1073446855313:web:243438becc9f4f70989530"
         };
         
-        // Use the Canvas config if available, otherwise use the local config.
         const firebaseConfig = Object.keys(canvasFirebaseConfig).length > 0 ? canvasFirebaseConfig : localFirebaseConfig;
 
         let app, db, auth, userId;
+        let masterPassword = null;
+        let masterKey = null;
 
-        // Display the user ID in the UI for collaborative apps
         const userIdDisplay = document.getElementById('userIdDisplay');
         const noPasswordsMessage = document.getElementById('noPasswordsMessage');
+        const masterPasswordSection = document.getElementById('masterPasswordSection');
+        const masterPasswordTitle = document.getElementById('masterPasswordTitle');
+        const masterPasswordMessage = document.getElementById('masterPasswordMessage');
+        const masterPasswordInput = document.getElementById('masterPasswordInput');
+        const masterPasswordConfirmDiv = document.getElementById('masterPasswordConfirmDiv');
+        const masterPasswordConfirm = document.getElementById('masterPasswordConfirm');
+        const masterPasswordBtn = document.getElementById('masterPasswordBtn');
+        const vaultContent = document.getElementById('vaultContent');
 
-        // Function to show the custom modal
         function showModal(title, message) {
             const modal = document.getElementById('messageModal');
             document.getElementById('modalTitle').textContent = title;
@@ -159,7 +187,6 @@
             modal.classList.remove('hidden');
         }
 
-        // Event listener for the modal close button
         document.getElementById('closeModalBtn').addEventListener('click', () => {
             document.getElementById('messageModal').classList.add('hidden');
         });
@@ -170,15 +197,12 @@
             auth = getAuth(app);
             db = getFirestore(app);
 
-            // Listen for auth state changes
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     userId = user.uid;
                     userIdDisplay.textContent = userId;
-                    // Start listening to the passwords collection after auth is ready
-                    listenForPasswords();
+                    checkMasterPasswordStatus();
                 } else {
-                    // Sign in anonymously if not authenticated
                     try {
                         if (initialAuthToken) {
                             await signInWithCustomToken(auth, initialAuthToken);
@@ -192,12 +216,115 @@
                 }
             });
         } else {
-            // This case should be handled by the localFirebaseConfig fallback
             console.error("Firebase config is not available.");
             showModal("Setup Error", "Firebase configuration is missing. The app cannot function.");
         }
-        
-        // --- Password Generation Logic ---
+
+        // --- Master Password and Encryption Logic ---
+        async function checkMasterPasswordStatus() {
+            const userDocRef = doc(db, 'artifacts', appId, 'users', userId);
+            const userDocSnap = await getDoc(userDocRef);
+            
+            if (userDocSnap.exists() && userDocSnap.data().masterPasswordHash) {
+                // User has set a master password, ask them to log in
+                masterPasswordTitle.textContent = 'Enter Your Master Password';
+                masterPasswordMessage.textContent = 'You must enter your master password to access your vault.';
+                masterPasswordConfirmDiv.classList.add('hidden');
+                masterPasswordBtn.textContent = 'Unlock Vault';
+            } else {
+                // First time user, prompt to set master password
+                masterPasswordTitle.textContent = 'Set Your Master Password';
+                masterPasswordMessage.textContent = 'This will be used to encrypt all your data. Do not forget it!';
+                masterPasswordConfirmDiv.classList.remove('hidden');
+                masterPasswordBtn.textContent = 'Set Master Password';
+            }
+            masterPasswordSection.classList.remove('hidden');
+            masterPasswordInput.focus();
+        }
+
+        async function setMasterPassword() {
+            const password = masterPasswordInput.value;
+            const confirmPassword = masterPasswordConfirm.value;
+            if (password.length < 8) {
+                showModal("Error", "Master password must be at least 8 characters long.");
+                return;
+            }
+            if (password !== confirmPassword) {
+                showModal("Error", "Passwords do not match.");
+                return;
+            }
+
+            try {
+                // Use a key derivation function to create a secure hash of the password
+                const salt = sjcl.random.randomWords(8, 0); // 256 bits of salt
+                const iterations = 10000;
+                const key = await sjcl.misc.pbkdf2(password, salt, iterations);
+                const masterPasswordHash = sjcl.codec.base64.fromBits(key);
+
+                // Save only the hash (not the password) and salt to Firestore
+                const userDocRef = doc(db, 'artifacts', appId, 'users', userId);
+                await setDoc(userDocRef, {
+                    masterPasswordHash: masterPasswordHash,
+                    salt: sjcl.codec.base64.fromBits(salt)
+                }, { merge: true });
+
+                masterPassword = password;
+                masterKey = key;
+                masterPasswordSection.classList.add('hidden');
+                vaultContent.classList.remove('hidden');
+                listenForPasswords();
+            } catch (error) {
+                console.error("Error setting master password:", error);
+                showModal("Error", "Failed to set master password. Please try again.");
+            }
+        }
+
+        async function unlockVault() {
+            const password = masterPasswordInput.value;
+            if (!password) {
+                showModal("Error", "Please enter your master password.");
+                return;
+            }
+            
+            const userDocRef = doc(db, 'artifacts', appId, 'users', userId);
+            const userDocSnap = await getDoc(userDocRef);
+            const data = userDocSnap.data();
+
+            if (!data || !data.masterPasswordHash || !data.salt) {
+                showModal("Error", "No master password found for this user. Please set one.");
+                return;
+            }
+
+            try {
+                const salt = sjcl.codec.base64.toBits(data.salt);
+                const iterations = 10000;
+                const derivedKey = await sjcl.misc.pbkdf2(password, salt, iterations);
+                const derivedHash = sjcl.codec.base64.fromBits(derivedKey);
+
+                if (derivedHash === data.masterPasswordHash) {
+                    masterPassword = password;
+                    masterKey = derivedKey;
+                    masterPasswordSection.classList.add('hidden');
+                    vaultContent.classList.remove('hidden');
+                    listenForPasswords();
+                } else {
+                    showModal("Authentication Failed", "Incorrect master password.");
+                }
+            } catch (error) {
+                console.error("Error unlocking vault:", error);
+                showModal("Error", "Authentication failed. Please try again.");
+            }
+        }
+
+        masterPasswordBtn.addEventListener('click', async () => {
+            if (masterPasswordBtn.textContent === 'Set Master Password') {
+                setMasterPassword();
+            } else {
+                unlockVault();
+            }
+        });
+
+        // --- Password Generation Logic (Unchanged) ---
         const generatePasswordBtn = document.getElementById('generatePasswordBtn');
         const generatedPasswordInput = document.getElementById('generatedPassword');
         const passwordLengthInput = document.getElementById('passwordLength');
@@ -227,17 +354,14 @@
             }
 
             let password = '';
-            // Ensure at least one character of each selected type is included
             if (includeUppercase) password += uppercaseChars.charAt(Math.floor(Math.random() * uppercaseChars.length));
             if (includeNumbers) password += numberChars.charAt(Math.floor(Math.random() * numberChars.length));
             if (includeSymbols) password += symbolChars.charAt(Math.floor(Math.random() * symbolChars.length));
             
-            // Fill the rest of the password
             for (let i = password.length; i < length; i++) {
                 password += allChars.charAt(Math.floor(Math.random() * allChars.length));
             }
             
-            // Shuffle the password to randomize the order
             password = password.split('').sort(() => 0.5 - Math.random()).join('');
             
             generatedPasswordInput.value = password;
@@ -246,7 +370,7 @@
 
         generatePasswordBtn.addEventListener('click', generatePassword);
 
-        // --- Password Strength Check Logic ---
+        // --- Password Strength Check Logic (Unchanged) ---
         const passwordInput = document.getElementById('passwordInput');
         const passwordStrengthIndicator = document.getElementById('passwordStrength');
 
@@ -257,10 +381,8 @@
                 return;
             }
             
-            // Length score
             score += Math.min(password.length, 16) * 4;
             
-            // Character type scores
             const hasLowercase = /[a-z]/.test(password);
             const hasUppercase = /[A-Z]/.test(password);
             const hasNumbers = /[0-9]/.test(password);
@@ -287,7 +409,7 @@
 
         passwordInput.addEventListener('input', (e) => checkPasswordStrength(e.target.value));
 
-        // --- Password Visibility Toggle ---
+        // --- Password Visibility Toggle (Unchanged) ---
         const togglePasswordVisibilityBtn = document.getElementById('togglePasswordVisibility');
         togglePasswordVisibilityBtn.addEventListener('click', () => {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -301,8 +423,8 @@
         const passwordList = document.getElementById('passwordList');
 
         savePasswordBtn.addEventListener('click', async () => {
-            if (!userId) {
-                showModal("Authentication Required", "Please wait for authentication to complete before saving.");
+            if (!userId || !masterKey) {
+                showModal("Authentication Required", "Please enter your master password to save items.");
                 return;
             }
             
@@ -316,10 +438,12 @@
             }
 
             try {
+                // Encrypt the password data before saving
+                const dataToEncrypt = JSON.stringify({ website, username, password });
+                const encryptedData = sjcl.encrypt(masterKey, dataToEncrypt);
+                
                 await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'passwords'), {
-                    website,
-                    username,
-                    password,
+                    encryptedData,
                     createdAt: new Date()
                 });
                 websiteInput.value = '';
@@ -328,14 +452,29 @@
                 generatedPasswordInput.value = '';
                 passwordStrengthIndicator.textContent = '';
                 passwordInput.type = 'password';
-                showModal("Success", "Password saved successfully!");
+                showModal("Success", "Password saved and encrypted successfully!");
             } catch (e) {
-                console.error("Error adding document: ", e);
+                console.error("Error adding document:", e);
                 showModal("Error", "Failed to save password. Please try again.");
             }
         });
 
-        function renderPasswordItem(id, data) {
+        function renderPasswordItem(id, encryptedData) {
+            let data = null;
+            try {
+                // Decrypt the data if a master key is available
+                if (masterKey) {
+                    const decryptedString = sjcl.decrypt(masterKey, encryptedData);
+                    data = JSON.parse(decryptedString);
+                }
+            } catch (e) {
+                // If decryption fails, the master password might be wrong or the data is corrupted
+                console.error("Decryption failed:", e);
+                data = { website: 'Decryption Failed', username: 'Incorrect Password', password: '' };
+            }
+            
+            if (!data) return null; // Don't render if we can't get data
+
             const div = document.createElement('div');
             div.className = 'bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0';
             div.dataset.id = id;
@@ -373,7 +512,6 @@
                 const passwordInput = div.querySelector('input');
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                 passwordInput.setAttribute('type', type);
-                // For masking, we can change the custom style
                 passwordInput.style.webkitTextSecurity = (type === 'password' ? 'disc' : 'none');
             });
             
@@ -402,8 +540,10 @@
                 } else {
                     noPasswordsMessage.classList.add('hidden');
                     snapshot.forEach(doc => {
-                        const passwordItem = renderPasswordItem(doc.id, doc.data());
-                        passwordList.appendChild(passwordItem);
+                        const passwordItem = renderPasswordItem(doc.id, doc.data().encryptedData);
+                        if (passwordItem) {
+                            passwordList.appendChild(passwordItem);
+                        }
                     });
                 }
             }, (error) => {
