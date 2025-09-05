@@ -17,6 +17,16 @@
         .password-field {
             font-family: monospace;
         }
+        .live-feedback-container {
+            font-family: monospace;
+        }
+        .matched-char {
+            color: #16a34a;
+        }
+        .unmatched-char {
+            color: #dc2626;
+            background-color: #fca5a5;
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
@@ -41,6 +51,13 @@
                     <label for="masterPasswordConfirm" class="block text-sm font-medium text-gray-700">Confirm Master Password</label>
                     <input type="password" id="masterPasswordConfirm" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 password-field" placeholder="Confirm master password">
                     <div id="masterPasswordMatchMessage" class="mt-2 text-sm"></div>
+                    <div id="liveFeedback" class="mt-4 p-3 bg-white rounded-md border border-gray-300 hidden">
+                        <p class="text-sm font-semibold mb-1 text-gray-700">Live Comparison:</p>
+                        <div class="flex items-start text-xs live-feedback-container">
+                            <span class="flex-grow pr-1" id="liveFeedbackPassword"></span>
+                            <span class="flex-grow pl-1" id="liveFeedbackConfirm"></span>
+                        </div>
+                    </div>
                 </div>
                 <button id="masterPasswordBtn" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">Set Master Password</button>
             </div>
@@ -181,6 +198,9 @@
         const masterPasswordBtn = document.getElementById('masterPasswordBtn');
         const masterPasswordMatchMessage = document.getElementById('masterPasswordMatchMessage');
         const vaultContent = document.getElementById('vaultContent');
+        const liveFeedback = document.getElementById('liveFeedback');
+        const liveFeedbackPassword = document.getElementById('liveFeedbackPassword');
+        const liveFeedbackConfirm = document.getElementById('liveFeedbackConfirm');
 
         function showModal(title, message) {
             const modal = document.getElementById('messageModal');
@@ -244,35 +264,56 @@
             masterPasswordInput.focus();
         }
 
-        // Add real-time validation for password match, now with trimming and more robust comparison
-        masterPasswordConfirm.addEventListener('input', () => {
-            const password = masterPasswordInput.value.replace(/\s/g, '');
-            const confirmPassword = masterPasswordConfirm.value.replace(/\s/g, '');
+        // Live feedback and validation for password match
+        function updateLiveFeedback() {
+            const password = masterPasswordInput.value;
+            const confirmPassword = masterPasswordConfirm.value;
             
-            if (password === confirmPassword) {
+            let passwordHtml = '';
+            let confirmHtml = '';
+            let passwordsMatch = true;
+
+            const maxLength = Math.max(password.length, confirmPassword.length);
+            for (let i = 0; i < maxLength; i++) {
+                const char1 = password[i] || '';
+                const char2 = confirmPassword[i] || '';
+                
+                const classList = (char1 === char2) ? 'matched-char' : 'unmatched-char';
+                if (char1 !== char2) passwordsMatch = false;
+
+                passwordHtml += `<span class="${classList}">${char1}</span>`;
+                confirmHtml += `<span class="${classList}">${char2}</span>`;
+            }
+
+            liveFeedbackPassword.innerHTML = passwordHtml;
+            liveFeedbackConfirm.innerHTML = confirmHtml;
+            liveFeedback.classList.remove('hidden');
+            
+            if (passwordsMatch && password.length > 0) {
                 masterPasswordMatchMessage.textContent = 'Passwords match!';
                 masterPasswordMatchMessage.className = 'mt-2 text-sm text-green-600';
-            } else {
+            } else if (password.length > 0 || confirmPassword.length > 0) {
                 masterPasswordMatchMessage.textContent = 'Passwords do not match. Check for typos or invisible characters.';
                 masterPasswordMatchMessage.className = 'mt-2 text-sm text-red-600';
+            } else {
+                masterPasswordMatchMessage.textContent = '';
             }
-        });
+        }
+        
+        masterPasswordInput.addEventListener('input', updateLiveFeedback);
+        masterPasswordConfirm.addEventListener('input', updateLiveFeedback);
 
         async function setMasterPassword() {
-            // Be extra safe and strip ALL whitespace characters
-            const password = masterPasswordInput.value.replace(/\s/g, '');
-            const confirmPassword = masterPasswordConfirm.value.replace(/\s/g, '');
-
-            console.log("Attempting to set master password. Values for comparison:");
-            console.log("Password:", password);
-            console.log("Confirm Password:", confirmPassword);
+            const password = masterPasswordInput.value;
+            const confirmPassword = masterPasswordConfirm.value;
 
             if (password.length < 8) {
                 showModal("Error", "Master password must be at least 8 characters long.");
                 return;
             }
+            
             if (password !== confirmPassword) {
-                showModal("Error", "Passwords do not match. Please check for typos and extra spaces.");
+                showModal("Error", "Passwords do not match. Please use the live comparison to find the discrepancy.");
                 return;
             }
 
@@ -302,7 +343,7 @@
         }
 
         async function unlockVault() {
-            const password = masterPasswordInput.value.replace(/\s/g, '');
+            const password = masterPasswordInput.value;
             if (!password) {
                 showModal("Error", "Please enter your master password.");
                 return;
