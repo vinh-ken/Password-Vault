@@ -244,20 +244,29 @@
             masterPasswordInput.focus();
         }
 
-        // Add real-time validation for password match, now with trimming
+        // Add real-time validation for password match, now with trimming and more robust comparison
         masterPasswordConfirm.addEventListener('input', () => {
-            if (masterPasswordInput.value.trim() === masterPasswordConfirm.value.trim()) {
+            const password = masterPasswordInput.value.replace(/\s/g, '');
+            const confirmPassword = masterPasswordConfirm.value.replace(/\s/g, '');
+            
+            if (password === confirmPassword) {
                 masterPasswordMatchMessage.textContent = 'Passwords match!';
                 masterPasswordMatchMessage.className = 'mt-2 text-sm text-green-600';
             } else {
-                masterPasswordMatchMessage.textContent = 'Passwords do not match. Check for extra spaces.';
+                masterPasswordMatchMessage.textContent = 'Passwords do not match. Check for typos or invisible characters.';
                 masterPasswordMatchMessage.className = 'mt-2 text-sm text-red-600';
             }
         });
 
         async function setMasterPassword() {
-            const password = masterPasswordInput.value.trim();
-            const confirmPassword = masterPasswordConfirm.value.trim();
+            // Be extra safe and strip ALL whitespace characters
+            const password = masterPasswordInput.value.replace(/\s/g, '');
+            const confirmPassword = masterPasswordConfirm.value.replace(/\s/g, '');
+
+            console.log("Attempting to set master password. Values for comparison:");
+            console.log("Password:", password);
+            console.log("Confirm Password:", confirmPassword);
+
             if (password.length < 8) {
                 showModal("Error", "Master password must be at least 8 characters long.");
                 return;
@@ -293,7 +302,7 @@
         }
 
         async function unlockVault() {
-            const password = masterPasswordInput.value.trim();
+            const password = masterPasswordInput.value.replace(/\s/g, '');
             if (!password) {
                 showModal("Error", "Please enter your master password.");
                 return;
