@@ -370,7 +370,7 @@
                     masterKey = derivedKey;
                     masterPasswordSection.classList.add('hidden');
                     vaultContent.classList.remove('hidden');
-                    listenForPasswords();
+                    listenForPasswords(); // <-- Added this line to fetch passwords after unlocking
                 } else {
                     showModal("Authentication Failed", "Incorrect master password.");
                 }
