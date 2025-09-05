@@ -307,6 +307,13 @@
         masterPasswordConfirm.addEventListener('input', updateLiveFeedback);
 
         async function setMasterPassword() {
+            // New, crucial check for User ID
+            if (!userId) {
+                console.error("Master password set attempt failed: User ID is not available.");
+                showModal("Error", "Authentication is not complete. Please wait a moment and try again.");
+                return;
+            }
+
             const password = masterPasswordInput.value;
             const confirmPassword = masterPasswordConfirm.value;
 
