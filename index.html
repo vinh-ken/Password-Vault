@@ -317,11 +317,18 @@
                 showModal("Error", "Passwords do not match. Please use the live comparison to find the discrepancy.");
                 return;
             }
+            
+            if (typeof sjcl === 'undefined') {
+                showModal("Error", "Encryption library is not available. Please refresh the page.");
+                return;
+            }
 
             try {
                 // Use a key derivation function to create a secure hash of the password
                 const salt = sjcl.random.randomWords(8, 0); // 256 bits of salt
                 const iterations = 10000;
+                
+                // This is the call that might fail
                 const key = await sjcl.misc.pbkdf2(password, salt, iterations);
                 const masterPasswordHash = sjcl.codec.base64.fromBits(key);
 
@@ -337,6 +344,7 @@
                 masterPasswordSection.classList.add('hidden');
                 vaultContent.classList.remove('hidden');
                 listenForPasswords();
+                showModal("Success!", "Master password set successfully. Your vault is now ready.");
             } catch (error) {
                 console.error("Error setting master password:", error);
                 showModal("Error", "Failed to set master password. Please try again.");
@@ -370,7 +378,7 @@
                     masterKey = derivedKey;
                     masterPasswordSection.classList.add('hidden');
                     vaultContent.classList.remove('hidden');
-                    listenForPasswords(); // <-- Added this line to fetch passwords after unlocking
+                    listenForPasswords();
                 } else {
                     showModal("Authentication Failed", "Incorrect master password.");
                 }
