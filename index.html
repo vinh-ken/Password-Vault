@@ -261,6 +261,8 @@
                 masterPasswordMessage.textContent = 'This will be used to encrypt all your data. Do not forget it!';
                 masterPasswordConfirmDiv.classList.remove('hidden');
                 masterPasswordBtn.textContent = 'Set Master Password';
+                masterPasswordMatchMessage.classList.remove('hidden');
+                liveFeedback.classList.remove('hidden');
             }
             masterPasswordSection.classList.remove('hidden');
             masterPasswordInput.focus();
@@ -289,7 +291,6 @@
 
             liveFeedbackPassword.innerHTML = passwordHtml;
             liveFeedbackConfirm.innerHTML = confirmHtml;
-            liveFeedback.classList.remove('hidden');
             
             if (passwordsMatch && password.length > 0) {
                 masterPasswordMatchMessage.textContent = 'Passwords match!';
