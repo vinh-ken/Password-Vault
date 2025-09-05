@@ -39,7 +39,7 @@
         </p>
 
         <!-- Master Password Section (Shown on startup) -->
-        <div id="masterPasswordSection" class="bg-gray-50 p-6 rounded-lg mb-6 shadow-sm border border-gray-200">
+        <div id="masterPasswordSection" class="bg-gray-50 p-6 rounded-lg mb-6 shadow-sm border border-gray-200 hidden">
             <h2 id="masterPasswordTitle" class="text-xl font-semibold text-gray-700 mb-4 text-center">Set Your Master Password</h2>
             <p id="masterPasswordMessage" class="text-center text-sm text-gray-600 mb-4"></p>
             <div class="space-y-4">
@@ -234,6 +234,8 @@
                     } catch (error) {
                         console.error("Error signing in:", error);
                         showModal("Authentication Error", "There was an issue signing you in. Please refresh the page.");
+                        masterPasswordSection.classList.add('hidden');
+                        vaultContent.classList.add('hidden');
                     }
                 }
             });
