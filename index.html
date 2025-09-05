@@ -328,8 +328,7 @@
                 const salt = sjcl.random.randomWords(8, 0); // 256 bits of salt
                 const iterations = 10000;
                 
-                // This is the call that might fail
-                const key = sjcl.misc.pbkdf2(password, salt, iterations);
+                const key = await sjcl.misc.pbkdf2(password, salt, iterations);
                 const masterPasswordHash = sjcl.codec.base64.fromBits(key);
 
                 // Save only the hash (not the password) and salt to Firestore
@@ -370,7 +369,7 @@
             try {
                 const salt = sjcl.codec.base64.toBits(data.salt);
                 const iterations = 10000;
-                const derivedKey = sjcl.misc.pbkdf2(password, salt, iterations);
+                const derivedKey = await sjcl.misc.pbkdf2(password, salt, iterations);
                 const derivedHash = sjcl.codec.base64.fromBits(derivedKey);
 
                 if (derivedHash === data.masterPasswordHash) {
