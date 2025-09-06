@@ -186,6 +186,7 @@
         let app, db, auth, userId;
         let masterPassword = null;
         let masterKey = null;
+        let isAuthReady = false; // New flag to track authentication state
 
         const userIdDisplay = document.getElementById('userIdDisplay');
         const noPasswordsMessage = document.getElementById('noPasswordsMessage');
@@ -224,8 +225,9 @@
                 if (user) {
                     userId = user.uid;
                     userIdDisplay.textContent = userId;
+                    isAuthReady = true; // Auth is now ready
                     checkMasterPasswordStatus();
-                    // Enable the button once the user is authenticated
+                    // Enable the button once the user is authenticated and ready
                     masterPasswordBtn.disabled = false;
                 } else {
                     try {
@@ -307,10 +309,9 @@
         masterPasswordConfirm.addEventListener('input', updateLiveFeedback);
 
         async function setMasterPassword() {
-            // New, crucial check for User ID
-            if (!userId) {
-                console.error("Master password set attempt failed: User ID is not available.");
-                showModal("Error", "Authentication is not complete. Please wait a moment and try again.");
+            // CRUCIAL: Check if auth and db are ready before proceeding
+            if (!isAuthReady || !userId) {
+                showModal("Please Wait", "The app is still setting up. Please wait a moment and try again.");
                 return;
             }
 
