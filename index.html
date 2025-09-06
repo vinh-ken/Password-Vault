@@ -204,22 +204,22 @@
         
         // --- Main Application Startup Logic ---
         (async () => {
+            let firebaseConfig;
             try {
-                // Log the variables to help debug
-                console.log('App ID:', appId);
-                console.log('Initial Auth Token:', initialAuthToken);
-                
-                // Use a default config if the environment variable is not present
-                const firebaseConfig = typeof __firebase_config !== 'undefined' && __firebase_config !== '' ?
-                    JSON.parse(__firebase_config) :
-                    {
-                        apiKey: "dummy-api-key",
-                        authDomain: "dummy-project.firebaseapp.com",
-                        projectId: "dummy-project",
-                        storageBucket: "dummy-project.appspot.com",
-                        messagingSenderId: "123456789",
-                        appId: "1:123456789:web:abcdef"
-                    };
+                // Check if the __firebase_config environment variable is available and valid
+                if (typeof __firebase_config !== 'undefined' && __firebase_config !== '') {
+                    firebaseConfig = JSON.parse(__firebase_config);
+                } else {
+                    // Fallback for when the environment variable is not set
+                    firebaseConfig = { apiKey: "dummy-api-key" };
+                }
+
+                // Check specifically for the dummy API key
+                if (firebaseConfig.apiKey === 'dummy-api-key') {
+                    showModal("Setup Error", "This app could not start because it is missing the Firebase configuration. This is often a temporary issue with the platform. Please refresh the page. If the problem persists, contact support.");
+                    masterPasswordSection.classList.add('hidden');
+                    return;
+                }
 
                 // Initialize Firebase services
                 app = initializeApp(firebaseConfig);
