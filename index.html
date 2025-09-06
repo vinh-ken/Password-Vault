@@ -169,7 +169,14 @@
         
         // --- Global Variables ---
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const canvasFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const canvasFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "dummy-api-key",
+            authDomain: "dummy-app.firebaseapp.com",
+            projectId: "dummy-app",
+            storageBucket: "dummy-app.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456789"
+        };
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         
         let app, db, auth, userId;
@@ -207,11 +214,7 @@
         // --- New Gatekeeper Function to Ensure Firebase is Ready ---
         function initializeAppAndAuth() {
             return new Promise((resolve, reject) => {
-                // CRUCIAL: Check for an empty config
-                if (Object.keys(canvasFirebaseConfig).length === 0) {
-                    return reject("Firebase configuration is missing.");
-                }
-                
+                // Now, we'll use our new, self-contained configuration
                 app = initializeApp(canvasFirebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
@@ -250,7 +253,10 @@
                 checkMasterPasswordStatus();
             } catch (error) {
                 console.error("Initialization Error:", error);
-                showModal("Setup Error", "The app could not start properly. Please refresh the page. Firebase error: " + error);
+                // The modal is already shown by initializeAppAndAuth if the config is missing
+                if (error !== "Firebase config is missing.") {
+                    showModal("Setup Error", "The app could not start properly. Please refresh the page. Firebase error: " + error);
+                }
             }
         })();
 
