@@ -168,21 +168,12 @@
         import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // --- Global Variables ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const canvasFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "dummy-api-key",
-            authDomain: "dummy-app.firebaseapp.com",
-            projectId: "dummy-app",
-            storageBucket: "dummy-app.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef123456789"
-        };
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
         let app, db, auth, userId;
         let masterPassword = null;
         let masterKey = null;
-
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
         // --- DOM Elements ---
         const userIdDisplay = document.getElementById('userIdDisplay');
         const noPasswordsMessage = document.getElementById('noPasswordsMessage');
@@ -210,53 +201,49 @@
         document.getElementById('closeModalBtn').addEventListener('click', () => {
             document.getElementById('messageModal').classList.add('hidden');
         });
-
-        // --- New Gatekeeper Function to Ensure Firebase is Ready ---
-        function initializeAppAndAuth() {
-            return new Promise((resolve, reject) => {
-                // Now, we'll use our new, self-contained configuration
-                app = initializeApp(canvasFirebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-
-                // Set up the listener to resolve the promise only when auth is complete
-                const unsubscribe = onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        userIdDisplay.textContent = userId;
-                        unsubscribe(); // Stop listening after we have a user
-                        resolve(user);
-                    } else {
-                        // Attempt to sign in if no user is found
-                        try {
-                            if (initialAuthToken) {
-                                await signInWithCustomToken(auth, initialAuthToken);
-                            } else {
-                                await signInAnonymously(auth);
-                            }
-                        } catch (error) {
-                            reject("Authentication failed: " + error.message);
-                        }
-                    }
-                });
-            });
-        }
         
         // --- Main Application Startup Logic ---
         (async () => {
             try {
-                // Wait for Firebase to be ready before doing anything else
-                await initializeAppAndAuth();
+                // Log the variables to help debug
+                console.log('App ID:', appId);
+                console.log('Initial Auth Token:', initialAuthToken);
                 
-                // Once ready, enable the button and check for existing passwords
+                // Use a default config if the environment variable is not present
+                const firebaseConfig = typeof __firebase_config !== 'undefined' && __firebase_config !== '' ?
+                    JSON.parse(__firebase_config) :
+                    {
+                        apiKey: "dummy-api-key",
+                        authDomain: "dummy-project.firebaseapp.com",
+                        projectId: "dummy-project",
+                        storageBucket: "dummy-project.appspot.com",
+                        messagingSenderId: "123456789",
+                        appId: "1:123456789:web:abcdef"
+                    };
+
+                // Initialize Firebase services
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                
+                // Authenticate the user
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                userId = auth.currentUser.uid;
+                userIdDisplay.textContent = userId;
+                
+                // Once authenticated, check master password status
                 masterPasswordBtn.disabled = false;
                 checkMasterPasswordStatus();
+
             } catch (error) {
                 console.error("Initialization Error:", error);
-                // The modal is already shown by initializeAppAndAuth if the config is missing
-                if (error !== "Firebase config is missing.") {
-                    showModal("Setup Error", "The app could not start properly. Please refresh the page. Firebase error: " + error);
-                }
+                showModal("Setup Error", "The app could not start properly. Please check the console for details. Error: " + error.message);
+                masterPasswordSection.classList.add('hidden');
             }
         })();
 
@@ -345,7 +332,7 @@
                 const salt = sjcl.random.randomWords(8, 0); // 256 bits of salt
                 const iterations = 10000;
                 
-                const key = await sjcl.misc.pbkdf2(password, salt, iterations);
+                const key = sjcl.misc.pbkdf2(password, salt, iterations);
                 const masterPasswordHash = sjcl.codec.base64.fromBits(key);
 
                 // Save only the hash (not the password) and salt to Firestore
@@ -386,7 +373,7 @@
             try {
                 const salt = sjcl.codec.base64.toBits(data.salt);
                 const iterations = 10000;
-                const derivedKey = await sjcl.misc.pbkdf2(password, salt, iterations);
+                const derivedKey = sjcl.misc.pbkdf2(password, salt, iterations);
                 const derivedHash = sjcl.codec.base64.fromBits(derivedKey);
 
                 if (derivedHash === data.masterPasswordHash) {
