@@ -172,6 +172,7 @@
         const canvasFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
+        // Fallback for local testing or when the config is not provided by the environment
         const localFirebaseConfig = {
           apiKey: "AIzaSyA8d5pVsBDOP9YJkn54dV-KjioD3IOyPw0",
           authDomain: "password-vault-81b22.firebaseapp.com",
@@ -181,6 +182,7 @@
           appId: "1:1073446855313:web:243438becc9f4f70989530"
         };
         
+        // Use the provided config, or the local fallback if not available
         const firebaseConfig = Object.keys(canvasFirebaseConfig).length > 0 ? canvasFirebaseConfig : localFirebaseConfig;
 
         let app, db, auth, userId;
@@ -218,6 +220,7 @@
         // --- New Gatekeeper Function to Ensure Firebase is Ready ---
         function initializeAppAndAuth() {
             return new Promise((resolve, reject) => {
+                // CRUCIAL: Check for an empty config
                 if (Object.keys(firebaseConfig).length === 0) {
                     return reject("Firebase config is missing.");
                 }
@@ -260,7 +263,7 @@
                 checkMasterPasswordStatus();
             } catch (error) {
                 console.error("Initialization Error:", error);
-                showModal("Setup Error", "The app could not start properly. Please refresh the page. " + error);
+                showModal("Setup Error", "The app could not start properly. Please refresh the page. Firebase error: " + error);
             }
         })();
 
